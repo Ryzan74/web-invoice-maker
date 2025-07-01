@@ -1,12 +1,12 @@
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-family: 'Roboto', sans-serif; /* Menggunakan font default baru */
     margin: 0;
     padding: 20px;
     background-color: #f4f7f6;
     color: #333;
     display: flex;
     justify-content: center;
-    align-items: flex-start; /* Mengatur agar konten mulai dari atas */
+    align-items: flex-start;
     min-height: 100vh;
 }
 
@@ -16,22 +16,29 @@ body {
     border-radius: 8px;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
     width: 100%;
-    max-width: 1200px; /* Batasi lebar container */
+    max-width: 1200px;
     display: flex;
-    flex-wrap: wrap; /* Izinkan wrapping untuk tampilan responsif */
-    gap: 30px; /* Jarak antar kolom form dan preview */
+    flex-wrap: wrap;
+    gap: 30px;
 }
 
 h1, h2 {
     color: #2c3e50;
     text-align: center;
-    width: 100%; /* Agar heading mengambil lebar penuh */
+    width: 100%;
     margin-bottom: 20px;
 }
 
+hr {
+    border: 0;
+    border-top: 1px dashed #e0e0e0;
+    margin: 30px 0;
+    width: 100%;
+}
+
 .invoice-form, .invoice-preview {
-    flex: 1; /* Agar mengambil ruang yang sama */
-    min-width: 450px; /* Lebar minimum untuk masing-masing kolom */
+    flex: 1;
+    min-width: 450px;
     padding: 20px;
     border: 1px solid #e0e0e0;
     border-radius: 6px;
@@ -53,13 +60,14 @@ h1, h2 {
 .form-group input[type="email"],
 .form-group input[type="number"],
 .form-group input[type="date"],
-.form-group textarea {
-    width: calc(100% - 20px); /* Kurangi padding */
+.form-group textarea,
+.form-group select { /* Tambahan untuk select */
+    width: calc(100% - 20px);
     padding: 10px;
     border: 1px solid #ccc;
     border-radius: 4px;
     font-size: 1em;
-    box-sizing: border-box; /* Hitung padding dalam lebar */
+    box-sizing: border-box;
 }
 
 textarea {
@@ -110,17 +118,16 @@ button:hover {
 }
 
 .item-row input {
-    flex: 1; /* Agar input mengambil lebar yang tersedia */
+    flex: 1;
 }
 
 .item-quantity {
-    flex: 0 0 60px; /* Lebar tetap untuk kuantitas */
+    flex: 0 0 60px;
 }
 
 .item-price {
-    flex: 0 0 100px; /* Lebar tetap untuk harga */
+    flex: 0 0 100px;
 }
-
 
 /* Styling for Invoice Preview */
 #invoicePreview {
@@ -131,11 +138,12 @@ button:hover {
 }
 
 #invoiceContent {
-    min-height: 300px; /* Beri ruang untuk konten */
+    min-height: 300px;
     padding: 15px;
     border: 1px dashed #ccc;
     margin-bottom: 20px;
-    overflow-y: auto; /* Jika konten terlalu panjang */
+    overflow-y: auto;
+    background-color: #fff; /* Pastikan background putih */
 }
 
 #invoiceContent table {
@@ -155,31 +163,134 @@ button:hover {
     font-weight: bold;
 }
 
-#invoiceContent .text-right {
-    text-align: right;
+/* Tombol cetak dan unduh */
+#printInvoiceBtn, #downloadPdfBtn {
+    width: calc(50% - 5px); /* Bagi dua lebar */
+    margin-top: 15px;
 }
-
 #printInvoiceBtn {
-    width: 100%;
     background-color: #6c757d;
+    float: left;
 }
-
 #printInvoiceBtn:hover {
     background-color: #5a6268;
+}
+#downloadPdfBtn {
+    background-color: #28a745; /* Warna hijau untuk unduh */
+    float: right;
+}
+#downloadPdfBtn:hover {
+    background-color: #218838;
+}
+/* Clearfix untuk tombol float */
+.invoice-preview::after {
+    content: "";
+    clear: both;
+    display: table;
+}
+
+
+/* --- PREMIUM THEMES --- */
+
+/* Tema Default */
+.invoice-theme-default {
+    /* Font dan warna dasar sudah diatur di body */
+    border: 1px solid #ccc;
+}
+.invoice-theme-default h2, .invoice-theme-default h3 {
+    color: #2c3e50;
+}
+.invoice-theme-default table th {
+    background-color: #f2f2f2;
+    color: #333;
+}
+.invoice-theme-default table td {
+    border-bottom: 1px solid #eee;
+}
+
+/* Tema Modern */
+.invoice-theme-modern {
+    border: none;
+    box-shadow: 0 0 20px rgba(0,0,0,0.05);
+    font-family: Arial, sans-serif;
+}
+.invoice-theme-modern h2 {
+    color: #007bff; /* Biru cerah */
+    border-bottom: 2px solid #007bff;
+    padding-bottom: 10px;
+    margin-bottom: 30px;
+}
+.invoice-theme-modern h3 {
+    color: #555;
+    border-left: 4px solid #007bff;
+    padding-left: 10px;
+}
+.invoice-theme-modern table th {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 12px 8px;
+}
+.invoice-theme-modern table td {
+    border-bottom: 1px dashed #ddd;
+    padding: 10px 8px;
+}
+.invoice-theme-modern .total-section h3 { /* Jika ada */
+    color: #007bff;
+}
+
+/* Tema Elegan */
+.invoice-theme-elegant {
+    border: 2px solid #a0a0a0;
+    font-family: 'Playfair Display', serif; /* Font elegan */
+    background-color: #fafafa;
+}
+.invoice-theme-elegant h2 {
+    color: #4a4a4a;
+    font-size: 2.2em;
+    font-weight: 700;
+    margin-bottom: 25px;
+}
+.invoice-theme-elegant h3 {
+    color: #6a6a6a;
+    border-bottom: 1px solid #dcdcdc;
+    padding-bottom: 5px;
+    margin-bottom: 15px;
+}
+.invoice-theme-elegant table th {
+    background-color: #e8e8e8;
+    color: #4a4a4a;
+    font-weight: normal;
+    font-size: 0.9em;
+    padding: 10px 8px;
+}
+.invoice-theme-elegant table td {
+    border-bottom: 1px solid #e0e0e0;
+    padding: 8px;
+}
+.invoice-theme-elegant .total-section h3 {
+    color: #3a3a3a;
+    font-size: 1.5em;
 }
 
 /* Responsiveness */
 @media (max-width: 768px) {
     .container {
-        flex-direction: column; /* Tata letak kolom pada layar kecil */
+        flex-direction: column;
     }
     .invoice-form, .invoice-preview {
-        min-width: unset; /* Hapus min-width */
+        min-width: unset;
         width: 100%;
+    }
+    #printInvoiceBtn, #downloadPdfBtn {
+        width: 100%;
+        float: none;
+        margin-left: 0;
+        margin-right: 0;
     }
 }
 
-/* Print Specific Styles */
+/* Print Specific Styles - Penting untuk PDF via cetak */
 @media print {
     body * {
         visibility: hidden;
@@ -196,8 +307,19 @@ button:hover {
         box-shadow: none;
         border: none;
         background-color: white;
+        padding: 0; /* Hapus padding agar tidak ada margin yang tidak diinginkan */
     }
-    #printInvoiceBtn, .invoice-form, h1 {
-        display: none; /* Sembunyikan tombol print dan form saat mencetak */
+    #invoiceContent {
+        border: none; /* Hapus border dashed untuk cetak */
+        padding: 0; /* Hapus padding agar lebih pas */
+    }
+    /* Sembunyikan tombol saat mencetak */
+    #printInvoiceBtn, #downloadPdfBtn, .invoice-form, h1 {
+        display: none !important;
+    }
+    /* Pastikan header dan footer tabel terlihat */
+    #invoiceContent table th {
+        -webkit-print-color-adjust: exact; /* Penting untuk mencetak warna latar belakang */
+        color-adjust: exact; /* Standard */
     }
 }
