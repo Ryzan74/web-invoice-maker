@@ -1,70 +1,162 @@
+document.addEventListener('DOMContentLoaded', () => {
+    const addItemBtn = document.getElementById('addItemBtn');
+    const itemsContainer = document.getElementById('itemsContainer');
+    const generateInvoiceBtn = document.getElementById('generateInvoiceBtn');
+    const invoiceContent = document.getElementById('invoiceContent');
+    const printInvoiceBtn = document.getElementById('printInvoiceBtn');
 
-function addRow() {
-    const tbody = document.getElementById("item-body");
-    const tr = document.createElement("tr");
-    tr.innerHTML = \`
-        <td><input type="text" class="item-name" placeholder="Nama item"/></td>
-        <td><input type="number" class="item-qty" value="1"/></td>
-        <td><input type="number" class="item-price" value="0"/></td>
-        <td class="item-total">0</td>
-    \`;
-    tbody.appendChild(tr);
-    updateListeners();
-}
+    // Fungsi untuk menambahkan baris item baru
+    function addNewItemRow() {
+        const itemRow = document.createElement('div');
+        itemRow.classList.add('item-row');
+        itemRow.innerHTML = `
+            <input type="text" class="item-description" placeholder="Deskripsi Barang/Jasa">
+            <input type="number" class="item-quantity" placeholder="Qty" value="1" min="1">
+            <input type="number" class="item-price" placeholder="Harga Satuan" value="0" min="0">
+            <button class="remove-item-btn">X</button>
+        `;
+        itemsContainer.appendChild(itemRow);
 
-function updateListeners() {
-    document.querySelectorAll(".item-qty, .item-price").forEach(el => {
-        el.addEventListener("input", calculateTotal);
+        // Tambahkan event listener untuk tombol hapus pada baris baru
+        itemRow.querySelector('.remove-item-btn').addEventListener('click', () => {
+            itemRow.remove();
+        });
+    }
+
+    // Tambahkan event listener untuk tombol 'Tambah Item'
+    addItemBtn.addEventListener('click', addNewItemRow);
+
+    // Fungsi untuk memformat angka menjadi format mata uang Rupiah
+    function formatRupiah(number) {
+        return new Intl.NumberFormat('id-ID', {
+            style: 'currency',
+            currency: 'IDR',
+            minimumFractionDigits: 0
+        }).format(number);
+    }
+
+    // Fungsi untuk membuat dan menampilkan pratinjau invoice
+    generateInvoiceBtn.addEventListener('click', () => {
+        const invoiceNumber = document.getElementById('invoiceNumber').value;
+        const invoiceDate = document.getElementById('invoiceDate').value;
+        const dueDate = document.getElementById('dueDate').value;
+
+        const sellerName = document.getElementById('sellerName').value;
+        const sellerAddress = document.getElementById('sellerAddress').value;
+        const sellerPhone = document.getElementById('sellerPhone').value;
+        const sellerEmail = document.getElementById('sellerEmail').value;
+
+        const buyerName = document.getElementById('buyerName').value;
+        const buyerAddress = document.getElementById('buyerAddress').value;
+
+        const discount = parseFloat(document.getElementById('discount').value) || 0;
+        const taxRate = parseFloat(document.getElementById('taxRate').value) || 0; // dalam persen
+
+        let itemsHtml = '';
+        let subtotal = 0;
+
+        document.querySelectorAll('.item-row').forEach((row, index) => {
+            const description = row.querySelector('.item-description').value;
+            const quantity = parseInt(row.querySelector('.item-quantity').value) || 0;
+            const price = parseFloat(row.querySelector('.item-price').value) || 0;
+            const amount = quantity * price;
+
+            subtotal += amount;
+
+            itemsHtml += `
+                <tr>
+                    <td>${index + 1}</td>
+                    <td>${description}</td>
+                    <td class="text-right">${quantity}</td>
+                    <td class="text-right">${formatRupiah(price)}</td>
+                    <td class="text-right">${formatRupiah(amount)}</td>
+                </tr>
+            `;
+        });
+
+        const taxAmount = subtotal * (taxRate / 100);
+        const totalAmount = subtotal - discount + taxAmount;
+
+        invoiceContent.innerHTML = `
+            <div style="text-align: center; margin-bottom: 20px;">
+                <h2 style="color: #2c3e50;">FAKTUR / INVOICE</h2>
+                <p><strong>Nomor Invoice:</strong> ${invoiceNumber}</p>
+                <p><strong>Tanggal Invoice:</strong> ${invoiceDate}</p>
+                <p><strong>Jatuh Tempo:</strong> ${dueDate}</p>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 10px;">
+                <div style="width: 48%;">
+                    <h3 style="color: #555;">DARI:</h3>
+                    <p><strong>${sellerName}</strong></p>
+                    <p>${sellerAddress}</p>
+                    <p>Telp: ${sellerPhone}</p>
+                    <p>Email: ${sellerEmail}</p>
+                </div>
+                <div style="width: 48%;">
+                    <h3 style="color: #555;">KEPADA:</h3>
+                    <p><strong>${buyerName}</strong></p>
+                    <p>${buyerAddress}</p>
+                </div>
+            </div>
+
+            <h3>RINCIAN BARANG/JASA</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>No.</th>
+                        <th>Deskripsi</th>
+                        <th class="text-right">Qty</th>
+                        <th class="text-right">Harga Satuan</th>
+                        <th class="text-right">Jumlah</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${itemsHtml}
+                </tbody>
+            </table>
+
+            <div style="text-align: right; margin-top: 20px;">
+                <p>Subtotal: <span class="text-right">${formatRupiah(subtotal)}</span></p>
+                <p>Diskon: <span class="text-right">(${formatRupiah(discount)})</span></p>
+                <p>Pajak (${taxRate}%): <span class="text-right">${formatRupiah(taxAmount)}</span></p>
+                <h3>TOTAL AKHIR: <span class="text-right">${formatRupiah(totalAmount)}</span></h3>
+            </div>
+
+            <div style="margin-top: 30px; border-top: 1px solid #eee; padding-top: 15px;">
+                <h3>METODE PEMBAYARAN</h3>
+                <p>Transfer Bank ke:</p>
+                <p>Bank: [Nama Bank Anda]</p>
+                <p>Nomor Rekening: [Nomor Rekening Anda]</p>
+                <p>Atas Nama: [Nama Pemilik Rekening]</p>
+            </div>
+
+            <div style="margin-top: 20px; font-style: italic; color: #777;">
+                <p>Catatan: Mohon lakukan pembayaran sebelum tanggal jatuh tempo. Terima kasih atas kepercayaan Anda.</p>
+            </div>
+        `;
     });
-}
 
-function calculateTotal() {
-    let grand = 0;
-    document.querySelectorAll("#item-body tr").forEach(row => {
-        const qty = parseFloat(row.querySelector(".item-qty").value) || 0;
-        const price = parseFloat(row.querySelector(".item-price").value) || 0;
-        const total = qty * price;
-        row.querySelector(".item-total").textContent = total.toFixed(2);
-        grand += total;
-    });
-    document.getElementById("grand-total").textContent = grand.toFixed(2);
-}
-
-async function downloadInvoice() {
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF();
-    let y = 20;
-
-    const sender = document.getElementById("sender").value;
-    const client = document.getElementById("client").value;
-    const note = document.getElementById("note").value;
-    const dueDate = document.getElementById("due-date").value;
-
-    doc.text("Invoice Generator Pro", 20, y);
-    y += 10;
-    doc.text("Pengirim: " + sender, 20, y);
-    y += 10;
-    doc.text("Klien: " + client, 20, y);
-    y += 10;
-    doc.text("Jatuh Tempo: " + dueDate, 20, y);
-    y += 10;
-    doc.text("Item        Qty     Harga     Total", 20, y);
-    y += 10;
-
-    document.querySelectorAll("#item-body tr").forEach(row => {
-        const item = row.querySelector(".item-name").value;
-        const qty = row.querySelector(".item-qty").value;
-        const price = row.querySelector(".item-price").value;
-        const total = (qty * price).toFixed(2);
-        doc.text(\`\${item}    \${qty}    \${price}    \${total}\`, 20, y);
-        y += 10;
+    // Event listener untuk tombol cetak
+    printInvoiceBtn.addEventListener('click', () => {
+        window.print();
     });
 
-    doc.text("Total Harga: " + document.getElementById("grand-total").textContent, 20, y);
-    y += 10;
-    doc.text("Catatan: " + note, 20, y + 10);
-    doc.save("invoice_pro.pdf");
-}
+    // Panggil sekali untuk memastikan ada baris item awal saat halaman dimuat
+    addNewItemRow();
 
-updateListeners();
-calculateTotal();
+    // Set tanggal saat ini sebagai default
+    const today = new Date();
+    const yyyy = today.getFullYear();
+    const mm = String(today.getMonth() + 1).padStart(2, '0'); // Months start at 0!
+    const dd = String(today.getDate()).padStart(2, '0');
+    document.getElementById('invoiceDate').value = `${yyyy}-${mm}-${dd}`;
+
+    // Set tanggal jatuh tempo 14 hari dari sekarang
+    const dueDateObj = new Date();
+    dueDateObj.setDate(today.getDate() + 14);
+    const dueYyyy = dueDateObj.getFullYear();
+    const dueMm = String(dueDateObj.getMonth() + 1).padStart(2, '0');
+    const dueDd = String(dueDateObj.getDate()).padStart(2, '0');
+    document.getElementById('dueDate').value = `${dueYyyy}-${dueMm}-${dueDd}`;
+});
