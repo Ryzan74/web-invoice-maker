@@ -6,42 +6,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const printInvoiceBtn = document.getElementById('printInvoiceBtn');
     const downloadPdfBtn = document.getElementById('downloadPdfBtn');
 
-    // Fungsi untuk menambahkan baris item baru
-    function addNewItemRow() {
-        const itemRow = document.createElement('div');
-        itemRow.classList.add('item-row');
-        itemRow.innerHTML = `
-            <input type="text" class="item-description" placeholder="Deskripsi Barang/Jasa">
-            <input type="number" class="item-quantity" placeholder="Qty" value="1" min="1">
-            <input type="number" class="item-price" placeholder="Harga Satuan" value="0" min="0">
-            <button class="remove-item-btn">X</button>
-        `;
-        itemsContainer.appendChild(itemRow);
+    // ... (Fungsi addNewItemRow, formatRupiah, generateInvoiceBtn.addEventListener tetap sama seperti versi sebelumnya) ...
 
-        // Tambahkan event listener untuk tombol hapus pada baris baru
-        itemRow.querySelector('.remove-item-btn').addEventListener('click', () => {
-            itemRow.remove();
-            // Setelah menghapus item, perbarui pratinjau invoice jika sudah ada
-            if (invoiceContent.innerHTML.trim() !== '') {
-                generateInvoiceBtn.click(); // Trigger ulang pembuatan invoice
-            }
-        });
-    }
-
-    // Tambahkan event listener untuk tombol 'Tambah Item'
-    addItemBtn.addEventListener('click', addNewItemRow);
-
-    // Fungsi untuk memformat angka menjadi format mata uang Rupiah
-    function formatRupiah(number) {
-        return new Intl.NumberFormat('id-ID', {
-            style: 'currency',
-            currency: 'IDR',
-            minimumFractionDigits: 0 // Tidak ada desimal untuk Rupiah
-        }).format(number);
-    }
-
-    // Fungsi untuk membuat dan menampilkan pratinjau invoice
+    // PENTING: Salin ulang seluruh generateInvoiceBtn.addEventListener di sini
+    // Ini untuk memastikan fungsi ini ada di dalam scope dan bisa dipanggil ulang
     generateInvoiceBtn.addEventListener('click', () => {
+        // ... (seluruh kode di dalam generateInvoiceBtn.addEventListener dari versi sebelumnya) ...
+        // PASTIKAN SEMUA VARIABEL DAN LOGIKA DI SINI SAMA PERSIS
         const invoiceNumber = document.getElementById('invoiceNumber').value;
         const invoiceDate = document.getElementById('invoiceDate').value;
         const dueDate = document.getElementById('dueDate').value;
@@ -82,8 +53,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const taxAmount = subtotal * (taxRate / 100);
         const totalAmount = subtotal - discount + taxAmount;
 
-        // Konten HTML untuk invoice yang akan dicetak/diunduh
-        // Penting: Pastikan gaya inline yang cukup agar konsisten di PDF
         const invoiceHtmlContent = `
             <div style="padding: 15px; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: #333;">
                 <div style="text-align: center; margin-bottom: 20px;">
@@ -147,6 +116,7 @@ document.addEventListener('DOMContentLoaded', () => {
         invoiceContent.innerHTML = invoiceHtmlContent;
     });
 
+
     // Event listener untuk tombol cetak
     printInvoiceBtn.addEventListener('click', () => {
         window.print();
@@ -159,6 +129,10 @@ document.addEventListener('DOMContentLoaded', () => {
         // Sembunyikan tombol cetak dan unduh saat akan dikonversi ke PDF
         printInvoiceBtn.style.display = 'none';
         downloadPdfBtn.style.display = 'none';
+
+        // PENTING: Panggil generateInvoiceBtn.click() lagi di sini
+        // Ini untuk memastikan DOM diperbarui dengan konten terbaru sebelum konversi
+        generateInvoiceBtn.click(); // Trigger ulang pembuatan invoice
 
         // Pastikan konten invoice sudah dibuat sebelum mengunduh
         if (invoiceContent.innerHTML.trim() === '') {
@@ -201,7 +175,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 printInvoiceBtn.style.display = 'block';
                 downloadPdfBtn.style.display = 'block';
             });
-        }, 300); // Penundaan 300ms untuk memastikan semua elemen termuat
+        }, 500); // Penundaan 500ms untuk memastikan semua elemen termuat
 
     });
 
