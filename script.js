@@ -4,6 +4,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const generateInvoiceBtn = document.getElementById('generateInvoiceBtn');
     const invoiceContent = document.getElementById('invoiceContent');
     const printInvoiceBtn = document.getElementById('printInvoiceBtn');
+    const downloadPdfBtn = document.getElementById('downloadPdfBtn'); // Dapatkan tombol baru
 
     // Fungsi untuk menambahkan baris item baru
     function addNewItemRow() {
@@ -77,7 +78,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const taxAmount = subtotal * (taxRate / 100);
         const totalAmount = subtotal - discount + taxAmount;
 
-        invoiceContent.innerHTML = `
+        // Konten HTML untuk invoice yang akan dicetak/diunduh
+        const invoiceHtmlContent = `
             <div style="text-align: center; margin-bottom: 20px;">
                 <h2 style="color: #2c3e50;">FAKTUR / INVOICE</h2>
                 <p><strong>Nomor Invoice:</strong> ${invoiceNumber}</p>
@@ -135,12 +137,30 @@ document.addEventListener('DOMContentLoaded', () => {
                 <p>Catatan: Mohon lakukan pembayaran sebelum tanggal jatuh tempo. Terima kasih atas kepercayaan Anda.</p>
             </div>
         `;
+        invoiceContent.innerHTML = invoiceHtmlContent;
     });
 
     // Event listener untuk tombol cetak
     printInvoiceBtn.addEventListener('click', () => {
         window.print();
     });
+
+    // Event listener untuk tombol unduh PDF
+    downloadPdfBtn.addEventListener('click', () => {
+        const element = document.getElementById('invoiceContent'); // Ambil elemen yang berisi konten invoice
+
+        // Opsi konfigurasi untuk html2pdf
+        const options = {
+            margin: 10,
+            filename: `invoice-${document.getElementById('invoiceNumber').value}.pdf`,
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { scale: 2, logging: true, dpi: 192, letterRendering: true },
+            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        };
+
+        html2pdf().from(element).set(options).save();
+    });
+
 
     // Panggil sekali untuk memastikan ada baris item awal saat halaman dimuat
     addNewItemRow();
