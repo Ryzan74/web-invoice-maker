@@ -78,61 +78,77 @@ document.addEventListener('DOMContentLoaded', () => {
         const totalAmount = subtotal - discount + taxAmount;
 
         invoiceContent.innerHTML = `
-            <div style="text-align: center; margin-bottom: 20px;">
-                <h2 style="color: #2c3e50;">FAKTUR / INVOICE</h2>
-                <p><strong>Nomor Invoice:</strong> ${invoiceNumber}</p>
-                <p><strong>Tanggal Invoice:</strong> ${invoiceDate}</p>
-                <p><strong>Jatuh Tempo:</strong> ${dueDate}</p>
-            </div>
+                <tr>
+                    <td style="border: 1px solid #eee; padding: 8px; text-align: left;">${index + 1}</td>
+                    <td style="border: 1px solid #eee; padding: 8px; text-align: left;">${description}</td>
+                    <td style="border: 1px solid #eee; padding: 8px; text-align: right;">${quantity}</td>
+                    <td style="border: 1px solid #eee; padding: 8px; text-align: right;">${formatRupiah(price)}</td>
+                    <td style="border: 1px solid #eee; padding: 8px; text-align: right;">${formatRupiah(amount)}</td>
+                </tr>
+            `;
+        });
 
-            <div style="display: flex; justify-content: space-between; margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 10px;">
-                <div style="width: 48%;">
-                    <h3 style="color: #555;">DARI:</h3>
-                    <p><strong>${sellerName}</strong></p>
-                    <p>${sellerAddress}</p>
-                    <p>Telp: ${sellerPhone}</p>
-                    <p>Email: ${sellerEmail}</p>
+        const taxAmount = subtotal * (taxRate / 100);
+        const totalAmount = subtotal - discount + taxAmount;
+
+        const invoiceHtmlContent = `
+            <div style="padding: 15px; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: #333;">
+                <div style="text-align: center; margin-bottom: 20px;">
+                    <h2 style="color: #2c3e50; margin-bottom: 5px;">FAKTUR / INVOICE</h2>
+                    <p style="margin: 2px 0;"><strong>Nomor Invoice:</strong> ${invoiceNumber}</p>
+                    <p style="margin: 2px 0;"><strong>Tanggal Invoice:</strong> ${invoiceDate}</p>
+                    <p style="margin: 2px 0;"><strong>Jatuh Tempo:</strong> ${dueDate}</p>
                 </div>
-                <div style="width: 48%;">
-                    <h3 style="color: #555;">KEPADA:</h3>
-                    <p><strong>${buyerName}</strong></p>
-                    <p>${buyerAddress}</p>
+
+                <div style="display: flex; justify-content: space-between; margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 10px;">
+                    <div style="width: 48%;">
+                        <h3 style="color: #555; margin-bottom: 5px;">DARI:</h3>
+                        <p style="margin: 2px 0;"><strong>${sellerName}</strong></p>
+                        <p style="margin: 2px 0;">${sellerAddress}</p>
+                        <p style="margin: 2px 0;">Telp: ${sellerPhone}</p>
+                        <p style="margin: 2px 0;">Email: ${sellerEmail}</p>
+                    </div>
+                    <div style="width: 48%;">
+                        <h3 style="color: #555; margin-bottom: 5px;">KEPADA:</h3>
+                        <p style="margin: 2px 0;"><strong>${buyerName}</strong></p>
+                        <p style="margin: 2px 0;">${buyerAddress}</p>
+                    </div>
                 </div>
-            </div>
 
-            <h3>RINCIAN BARANG/JASA</h3>
-            <table>
-                <thead>
-                    <tr>
-                        <th>No.</th>
-                        <th>Deskripsi</th>
-                        <th class="text-right">Qty</th>
-                        <th class="text-right">Harga Satuan</th>
-                        <th class="text-right">Jumlah</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    ${itemsHtml}
-                </tbody>
-            </table>
+                <h3 style="margin-top: 20px; margin-bottom: 10px;">RINCIAN BARANG/JASA</h3>
+                <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
+                    <thead>
+                        <tr>
+                            <th style="border: 1px solid #eee; padding: 8px; text-align: left; background-color: #f2f2f2;">No.</th>
+                            <th style="border: 1px solid #eee; padding: 8px; text-align: left; background-color: #f2f2f2;">Deskripsi</th>
+                            <th style="border: 1px solid #eee; padding: 8px; text-align: right; background-color: #f2f2f2;">Qty</th>
+                            <th style="border: 1px solid #eee; padding: 8px; text-align: right; background-color: #f2f2f2;">Harga Satuan</th>
+                            <th style="border: 1px solid #eee; padding: 8px; text-align: right; background-color: #f2f2f2;">Jumlah</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${itemsHtml}
+                    </tbody>
+                </table>
 
-            <div style="text-align: right; margin-top: 20px;">
-                <p>Subtotal: <span class="text-right">${formatRupiah(subtotal)}</span></p>
-                <p>Diskon: <span class="text-right">(${formatRupiah(discount)})</span></p>
-                <p>Pajak (${taxRate}%): <span class="text-right">${formatRupiah(taxAmount)}</span></p>
-                <h3>TOTAL AKHIR: <span class="text-right">${formatRupiah(totalAmount)}</span></h3>
-            </div>
+                <div style="text-align: right; margin-top: 20px;">
+                    <p style="margin: 2px 0;">Subtotal: <span style="text-align: right; display: inline-block; width: 120px;">${formatRupiah(subtotal)}</span></p>
+                    <p style="margin: 2px 0;">Diskon: <span style="text-align: right; display: inline-block; width: 120px;">(${formatRupiah(discount)})</span></p>
+                    <p style="margin: 2px 0;">Pajak (${taxRate}%): <span style="text-align: right; display: inline-block; width: 120px;">${formatRupiah(taxAmount)}</span></p>
+                    <h3 style="margin-top: 10px; margin-bottom: 5px;">TOTAL AKHIR: <span style="text-align: right; display: inline-block; width: 120px;">${formatRupiah(totalAmount)}</span></h3>
+                </div>
 
-            <div style="margin-top: 30px; border-top: 1px solid #eee; padding-top: 15px;">
-                <h3>METODE PEMBAYARAN</h3>
-                <p>Transfer Bank ke:</p>
-                <p>Bank: [Nama Bank Anda]</p>
-                <p>Nomor Rekening: [Nomor Rekening Anda]</p>
-                <p>Atas Nama: [Nama Pemilik Rekening]</p>
-            </div>
+                <div style="margin-top: 30px; border-top: 1px solid #eee; padding-top: 15px;">
+                    <h3 style="margin-bottom: 5px;">METODE PEMBAYARAN</h3>
+                    <p style="margin: 2px 0;">Transfer Bank ke:</p>
+                    <p style="margin: 2px 0;">Bank: [Nama Bank Anda]</p>
+                    <p style="margin: 2px 0;">Nomor Rekening: [Nomor Rekening Anda]</p>
+                    <p style="margin: 2px 0;">Atas Nama: [Nama Pemilik Rekening]</p>
+                </div>
 
-            <div style="margin-top: 20px; font-style: italic; color: #777;">
-                <p>Catatan: Mohon lakukan pembayaran sebelum tanggal jatuh tempo. Terima kasih atas kepercayaan Anda.</p>
+                <div style="margin-top: 20px; font-style: italic; color: #777;">
+                    <p>Catatan: Mohon lakukan pembayaran sebelum tanggal jatuh tempo. Terima kasih atas kepercayaan Anda.</p>
+                </div>
             </div>
         `;
     });
