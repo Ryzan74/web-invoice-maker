@@ -116,24 +116,23 @@ document.addEventListener('DOMContentLoaded', () => {
                 </tbody>
             </table>
 
-                <div style="text-align: right; margin-top: 20px;">
-                    <p style="margin: 2px 0;">Subtotal: <span style="text-align: right; display: inline-block; width: 120px;">${formatRupiah(subtotal)}</span></p>
-                    <p style="margin: 2px 0;">Diskon: <span style="text-align: right; display: inline-block; width: 120px;">(${formatRupiah(discount)})</span></p>
-                    <p style="margin: 2px 0;">Pajak (${taxRate}%): <span style="text-align: right; display: inline-block; width: 120px;">${formatRupiah(taxAmount)}</span></p>
-                    <h3 style="margin-top: 10px; margin-bottom: 5px;">TOTAL AKHIR: <span style="text-align: right; display: inline-block; width: 120px;">${formatRupiah(totalAmount)}</span></h3>
-                </div>
+            <div style="text-align: right; margin-top: 20px;">
+                <p>Subtotal: <span class="text-right">${formatRupiah(subtotal)}</span></p>
+                <p>Diskon: <span class="text-right">(${formatRupiah(discount)})</span></p>
+                <p>Pajak (${taxRate}%): <span class="text-right">${formatRupiah(taxAmount)}</span></p>
+                <h3>TOTAL AKHIR: <span class="text-right">${formatRupiah(totalAmount)}</span></h3>
+            </div>
 
-                <div style="margin-top: 30px; border-top: 1px solid #eee; padding-top: 15px;">
-                    <h3 style="margin-bottom: 5px;">METODE PEMBAYARAN</h3>
-                    <p style="margin: 2px 0;">Transfer Bank ke:</p>
-                    <p style="margin: 2px 0;">Bank: [Nama Bank Anda]</p>
-                    <p style="margin: 2px 0;">Nomor Rekening: [Nomor Rekening Anda]</p>
-                    <p style="margin: 2px 0;">Atas Nama: [Nama Pemilik Rekening]</p>
-                </div>
+            <div style="margin-top: 30px; border-top: 1px solid #eee; padding-top: 15px;">
+                <h3>METODE PEMBAYARAN</h3>
+                <p>Transfer Bank ke:</p>
+                <p>Bank: [Nama Bank Anda]</p>
+                <p>Nomor Rekening: [Nomor Rekening Anda]</p>
+                <p>Atas Nama: [Nama Pemilik Rekening]</p>
+            </div>
 
-                <div style="margin-top: 20px; font-style: italic; color: #777;">
-                    <p>Catatan: Mohon lakukan pembayaran sebelum tanggal jatuh tempo. Terima kasih atas kepercayaan Anda.</p>
-                </div>
+            <div style="margin-top: 20px; font-style: italic; color: #777;">
+                <p>Catatan: Mohon lakukan pembayaran sebelum tanggal jatuh tempo. Terima kasih atas kepercayaan Anda.</p>
             </div>
         `;
     });
