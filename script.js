@@ -33,48 +33,52 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Panggil sekali untuk memastikan ada baris item awal saat halaman dimuat
-    // Ini penting agar ada satu baris item saat pertama kali halaman dibuka
+    // --- PERBAIKAN PENTING DI SINI ---
+    // 1. Panggil addNewItemRow() sekali saat halaman dimuat untuk baris default
     addNewItemRow();
 
-
-    // Tambahkan event listener untuk tombol 'Tambah Item'
+    // 2. Kemudian, pasang event listener untuk tombol "Tambah Item"
     addItemBtn.addEventListener('click', addNewItemRow);
+    // --- AKHIR PERBAIKAN ---
 
 
     // Event listener untuk unggah logo
-    sellerLogoInput.addEventListener('change', (event) => {
-        const file = event.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                uploadedLogoBase64 = e.target.result;
-                logoPreview.src = uploadedLogoBase64;
-                logoPreview.style.display = 'block';
+    if (sellerLogoInput) { // Pastikan elemen ada (untuk kompatibilitas jika versi non-premium tanpa logo)
+        sellerLogoInput.addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    uploadedLogoBase64 = e.target.result;
+                    logoPreview.src = uploadedLogoBase64;
+                    logoPreview.style.display = 'block';
+                    if (invoiceContent.innerHTML.trim() !== '') {
+                        generateInvoiceBtn.click();
+                    }
+                };
+                reader.readAsDataURL(file);
+            } else {
+                uploadedLogoBase64 = '';
+                logoPreview.src = '';
+                logoPreview.style.display = 'none';
                 if (invoiceContent.innerHTML.trim() !== '') {
                     generateInvoiceBtn.click();
                 }
-            };
-            reader.readAsDataURL(file);
-        } else {
-            uploadedLogoBase64 = '';
-            logoPreview.src = '';
-            logoPreview.style.display = 'none';
+            }
+        });
+    }
+
+    // Event listener untuk perubahan tema
+    if (invoiceThemeSelect) { // Pastikan elemen ada
+        invoiceThemeSelect.addEventListener('change', () => {
+            const selectedTheme = invoiceThemeSelect.value;
+            invoiceContent.classList.remove('invoice-theme-default', 'invoice-theme-modern', 'invoice-theme-elegant');
+            invoiceContent.classList.add(`invoice-theme-${selectedTheme}`);
             if (invoiceContent.innerHTML.trim() !== '') {
                 generateInvoiceBtn.click();
             }
-        }
-    });
-
-    // Event listener untuk perubahan tema
-    invoiceThemeSelect.addEventListener('change', () => {
-        const selectedTheme = invoiceThemeSelect.value;
-        invoiceContent.classList.remove('invoice-theme-default', 'invoice-theme-modern', 'invoice-theme-elegant');
-        invoiceContent.classList.add(`invoice-theme-${selectedTheme}`);
-        if (invoiceContent.innerHTML.trim() !== '') {
-            generateInvoiceBtn.click();
-        }
-    });
+        });
+    }
 
 
     // Fungsi untuk memformat angka menjadi format mata uang Rupiah
@@ -174,4 +178,98 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div style="text-align: right; margin-top: 20px;">
                     <p style="margin: 2px 0;">Subtotal: <span style="text-align: right; display: inline-block; width: 120px;">${formatRupiah(subtotal)}</span></p>
                     <p style="margin: 2px 0;">Diskon: <span style="text-align: right; display: inline-block; width: 120px;">(${formatRupiah(discount)})</span></p>
-                    <p style="margin: 2px 0;">Pajak
+                    <p style="margin: 2px 0;">Pajak (${taxRate}%): <span style="text-align: right; display: inline-block; width: 120px;">${formatRupiah(taxAmount)}</span></p>
+                    <h3 style="margin-top: 10px; margin-bottom: 5px;">TOTAL AKHIR: <span style="text-align: right; display: inline-block; width: 120px;">${formatRupiah(totalAmount)}</span></h3>
+                </div>
+
+                <div style="margin-top: 30px; border-top: 1px solid #eee; padding-top: 15px;">
+                    <h3>METODE PEMBAYARAN</h3>
+                    <p style="margin: 2px 0;">Transfer Bank ke:</p>
+                    <p style="margin: 2px 0;">Bank: [Nama Bank Anda]</p>
+                    <p style="margin: 2px 0;">Nomor Rekening: [Nomor Rekening Anda]</p>
+                    <p style="margin: 2px 0;">Atas Nama: [Nama Pemilik Rekening]</p>
+                </div>
+
+                <div style="margin-top: 20px; font-style: italic; color: #777;">
+                    <p>Catatan: Mohon lakukan pembayaran sebelum tanggal jatuh tempo. Terima kasih atas kepercayaan Anda.</p>
+                </div>
+            </div>
+        `;
+        invoiceContent.innerHTML = invoiceHtmlContent;
+    });
+
+    // Event listener untuk tombol cetak
+    printInvoiceBtn.addEventListener('click', () => {
+        window.print();
+    });
+
+    // Event listener untuk tombol unduh PDF (via html2pdf.js)
+    downloadPdfBtn.addEventListener('click', () => {
+        const element = document.getElementById('invoicePreview');
+
+        printInvoiceBtn.style.display = 'none';
+        downloadPdfBtn.style.display = 'none';
+
+        generateInvoiceBtn.click(); // Perbarui invoice sebelum unduh
+
+        if (invoiceContent.innerHTML.trim() === '') {
+            alert('Harap buat invoice terlebih dahulu dengan menekan tombol "Buat Invoice".');
+            printInvoiceBtn.style.display = 'block';
+            downloadPdfBtn.style.display = 'block';
+            return;
+        }
+
+        const options = {
+            margin: 10,
+            filename: `invoice-${document.getElementById('invoiceNumber').value}.pdf`,
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: {
+                scale: 3,
+                logging: true,
+                dpi: 300,
+                letterRendering: true,
+                useCORS: true,
+                allowTaint: true,
+                scrollY: -window.scrollY,
+                backgroundColor: '#ffffff'
+            },
+            jsPDF: {
+                unit: 'mm',
+                format: 'a4',
+                orientation: 'portrait'
+            }
+        };
+
+        setTimeout(() => {
+            html2pdf().from(element).set(options).save().then(() => {
+                printInvoiceBtn.style.display = 'block';
+                downloadPdfBtn.style.display = 'block';
+            }).catch(error => {
+                console.error("Error generating PDF:", error);
+                alert("Terjadi kesalahan saat membuat PDF. Silakan coba lagi. Cek konsol browser (F12) untuk detail error.");
+                printInvoiceBtn.style.display = 'block';
+                downloadPdfBtn.style.display = 'block';
+            });
+        }, 500);
+    });
+
+
+    // Set tanggal saat ini sebagai default
+    const today = new Date();
+    const invoiceDateInput = document.getElementById('invoiceDate');
+    const dueDateInput = document.getElementById('dueDate');
+
+    const formatDate = (date) => {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    };
+
+    invoiceDateInput.value = formatDate(today);
+
+    // Set tanggal jatuh tempo 14 hari dari sekarang
+    const dueDateObj = new Date();
+    dueDateObj.setDate(today.getDate() + 14);
+    dueDateInput.value = formatDate(dueDateObj);
+});
