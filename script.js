@@ -5,13 +5,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const invoiceContent = document.getElementById('invoiceContent');
     const printInvoiceBtn = document.getElementById('printInvoiceBtn');
     const downloadPdfBtn = document.getElementById('downloadPdfBtn');
-    const sellerLogoInput = document.getElementById('sellerLogo'); // Input Logo
-    const logoPreview = document.getElementById('logoPreview'); // Pratinjau Logo
-    const invoiceThemeSelect = document.getElementById('invoiceTheme'); // Pilihan Tema
+    const sellerLogoInput = document.getElementById('sellerLogo');
+    const logoPreview = document.getElementById('logoPreview');
+    const invoiceThemeSelect = document.getElementById('invoiceTheme');
 
     let uploadedLogoBase64 = ''; // Variabel untuk menyimpan logo dalam format Base64
 
-    // Fungsi untuk menambahkan baris item baru
+    // --- Fungsi Utama untuk Menambah Baris Item Baru ---
     function addNewItemRow() {
         const itemRow = document.createElement('div');
         itemRow.classList.add('item-row');
@@ -23,51 +23,69 @@ document.addEventListener('DOMContentLoaded', () => {
         `;
         itemsContainer.appendChild(itemRow);
 
-        // Tambahkan event listener untuk tombol hapus pada baris baru
+        // Tambahkan event listener untuk tombol hapus pada baris yang baru dibuat
         itemRow.querySelector('.remove-item-btn').addEventListener('click', () => {
             itemRow.remove();
+            // Panggil ulang generateInvoiceBtn.click() agar pratinjau diperbarui setelah item dihapus
             if (invoiceContent.innerHTML.trim() !== '') {
                 generateInvoiceBtn.click();
             }
         });
     }
 
-    // Event listener untuk unggah logo
-    sellerLogoInput.addEventListener('change', (event) => {
-        const file = event.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                uploadedLogoBase64 = e.target.result;
-                logoPreview.src = uploadedLogoBase64;
-                logoPreview.style.display = 'block';
+    // --- Inisialisasi Awal dan Event Listeners ---
+
+    // Panggil fungsi untuk menambahkan satu baris item secara default saat halaman dimuat
+    addNewItemRow();
+
+    // Event listener untuk tombol "Tambah Item"
+    // Ini penting agar tombol berfungsi saat diklik
+    addItemBtn.addEventListener('click', addNewItemRow);
+
+    // Event listener untuk unggah logo (hanya jika elemennya ada)
+    if (sellerLogoInput) {
+        sellerLogoInput.addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    uploadedLogoBase64 = e.target.result;
+                    logoPreview.src = uploadedLogoBase64;
+                    logoPreview.style.display = 'block';
+                    // Perbarui pratinjau setelah logo diunggah
+                    if (invoiceContent.innerHTML.trim() !== '') {
+                        generateInvoiceBtn.click();
+                    }
+                };
+                reader.readAsDataURL(file);
+            } else {
+                // Jika file dihapus, reset logo
+                uploadedLogoBase64 = '';
+                logoPreview.src = '';
+                logoPreview.style.display = 'none';
                 if (invoiceContent.innerHTML.trim() !== '') {
-                    generateInvoiceBtn.click(); // Perbarui invoice setelah logo diunggah
+                    generateInvoiceBtn.click();
                 }
-            };
-            reader.readAsDataURL(file);
-        } else {
-            uploadedLogoBase64 = '';
-            logoPreview.src = '';
-            logoPreview.style.display = 'none';
-            if (invoiceContent.innerHTML.trim() !== '') {
-                generateInvoiceBtn.click(); // Perbarui invoice jika logo dihapus
             }
-        }
-    });
+        });
+    }
 
-    // Event listener untuk perubahan tema
-    invoiceThemeSelect.addEventListener('change', () => {
-        const selectedTheme = invoiceThemeSelect.value;
-        // Hapus semua kelas tema yang ada
-        invoiceContent.classList.remove('invoice-theme-default', 'invoice-theme-modern', 'invoice-theme-elegant');
-        // Tambahkan kelas tema yang dipilih
-        invoiceContent.classList.add(`invoice-theme-${selectedTheme}`);
-        if (invoiceContent.innerHTML.trim() !== '') {
-            generateInvoiceBtn.click(); // Perbarui invoice setelah tema berubah
-        }
-    });
+    // Event listener untuk perubahan tema (hanya jika elemennya ada)
+    if (invoiceThemeSelect) {
+        invoiceThemeSelect.addEventListener('change', () => {
+            const selectedTheme = invoiceThemeSelect.value;
+            // Hapus semua kelas tema yang ada
+            invoiceContent.classList.remove('invoice-theme-default', 'invoice-theme-modern', 'invoice-theme-elegant');
+            // Tambahkan kelas tema yang dipilih
+            invoiceContent.classList.add(`invoice-theme-${selectedTheme}`);
+            // Perbarui pratinjau setelah tema berubah
+            if (invoiceContent.innerHTML.trim() !== '') {
+                generateInvoiceBtn.click();
+            }
+        });
+    }
 
+    // --- Fungsi Pembantu ---
 
     // Fungsi untuk memformat angka menjadi format mata uang Rupiah
     function formatRupiah(number) {
@@ -78,7 +96,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }).format(number);
     }
 
-    // Fungsi untuk membuat dan menampilkan pratinjau invoice
+    // --- Fungsi Utama untuk Membuat dan Menampilkan Pratinjau Invoice ---
     generateInvoiceBtn.addEventListener('click', () => {
         const invoiceNumber = document.getElementById('invoiceNumber').value;
         const invoiceDate = document.getElementById('invoiceDate').value;
@@ -98,6 +116,7 @@ document.addEventListener('DOMContentLoaded', () => {
         let itemsHtml = '';
         let subtotal = 0;
 
+        // Loop melalui semua baris item yang ada dan hitung total
         document.querySelectorAll('.item-row').forEach((row, index) => {
             const description = row.querySelector('.item-description').value;
             const quantity = parseInt(row.querySelector('.item-quantity').value) || 0;
@@ -120,9 +139,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const taxAmount = subtotal * (taxRate / 100);
         const totalAmount = subtotal - discount + taxAmount;
 
-        // Tambahkan logo ke HTML invoice jika ada
+        // Siapkan HTML untuk logo jika ada
         const logoHtml = uploadedLogoBase64 ? `<img src="${uploadedLogoBase64}" alt="Logo Perusahaan" style="max-width: 150px; height: auto; margin-bottom: 15px; display: block; margin-left: auto; margin-right: auto;">` : '';
 
+        // Bangun seluruh konten HTML invoice
         const invoiceHtmlContent = `
             <div style="padding: 15px;">
                 ${logoHtml} <div style="text-align: center; margin-bottom: 20px;">
@@ -186,6 +206,8 @@ document.addEventListener('DOMContentLoaded', () => {
         invoiceContent.innerHTML = invoiceHtmlContent;
     });
 
+    // --- Fungsi Cetak dan Unduh PDF ---
+
     // Event listener untuk tombol cetak
     printInvoiceBtn.addEventListener('click', () => {
         window.print();
@@ -195,11 +217,15 @@ document.addEventListener('DOMContentLoaded', () => {
     downloadPdfBtn.addEventListener('click', () => {
         const element = document.getElementById('invoicePreview');
 
+        // Sembunyikan tombol cetak dan unduh saat akan dikonversi ke PDF
         printInvoiceBtn.style.display = 'none';
         downloadPdfBtn.style.display = 'none';
 
-        generateInvoiceBtn.click(); // Perbarui invoice sebelum unduh
+        // Panggil generateInvoiceBtn.click() lagi di sini untuk memastikan DOM diperbarui
+        // Ini adalah langkah kunci untuk mengatasi masalah blank PDF
+        generateInvoiceBtn.click();
 
+        // Pastikan konten invoice sudah dibuat sebelum mengunduh
         if (invoiceContent.innerHTML.trim() === '') {
             alert('Harap buat invoice terlebih dahulu dengan menekan tombol "Buat Invoice".');
             printInvoiceBtn.style.display = 'block';
@@ -212,14 +238,14 @@ document.addEventListener('DOMContentLoaded', () => {
             filename: `invoice-${document.getElementById('invoiceNumber').value}.pdf`,
             image: { type: 'jpeg', quality: 0.98 },
             html2canvas: {
-                scale: 3,
-                logging: true,
-                dpi: 300,
+                scale: 3, // Skala lebih tinggi untuk kualitas lebih baik
+                logging: true, // Aktifkan logging di konsol
+                dpi: 300, // Resolusi lebih tinggi
                 letterRendering: true,
-                useCORS: true,
-                allowTaint: true,
-                scrollY: -window.scrollY,
-                backgroundColor: '#ffffff'
+                useCORS: true, // Penting jika ada gambar dari domain lain
+                allowTaint: true, // Izinkan taint untuk gambar dari domain lain (jika useCORS gagal)
+                scrollY: -window.scrollY, // Pastikan dimulai dari atas halaman
+                backgroundColor: '#ffffff' // Pastikan background putih
             },
             jsPDF: {
                 unit: 'mm',
@@ -228,8 +254,10 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         };
 
+        // Menggunakan setTimeout dengan penundaan 500ms untuk memastikan semua elemen termuat dan dirender
         setTimeout(() => {
             html2pdf().from(element).set(options).save().then(() => {
+                // Tampilkan kembali tombol setelah PDF selesai diunduh
                 printInvoiceBtn.style.display = 'block';
                 downloadPdfBtn.style.display = 'block';
             }).catch(error => {
@@ -238,23 +266,21 @@ document.addEventListener('DOMContentLoaded', () => {
                 printInvoiceBtn.style.display = 'block';
                 downloadPdfBtn.style.display = 'block';
             });
-        }, 500); // Penundaan untuk memastikan DOM diperbarui
+        }, 500);
     });
 
+    // --- Pengaturan Tanggal Default ---
 
-    // Panggil sekali untuk memastikan ada baris item awal saat halaman dimuat
-    addNewItemRow();
-
-    // Set tanggal saat ini sebagai default
+    // Set tanggal saat ini sebagai default untuk Invoice Date dan Due Date
     const today = new Date();
     const invoiceDateInput = document.getElementById('invoiceDate');
     const dueDateInput = document.getElementById('dueDate');
 
     const formatDate = (date) => {
-        const yyyy = date.getFullYear();
-        const mm = String(date.getMonth() + 1).padStart(2, '0');
-        const dd = String(date.getDate()).padStart(2, '0');
-        return `${yyyy}-${mm}-${dd}`;
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
     };
 
     invoiceDateInput.value = formatDate(today);
