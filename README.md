@@ -1,4 +1,4 @@
-Tentu, ini dia file `README.md` untuk invoice generator Anda, dengan fokus pada fungsi cetak sebagai metode utama untuk mendapatkan PDF.
+
 
 ---
 
