@@ -21,6 +21,10 @@ document.addEventListener('DOMContentLoaded', () => {
         // Tambahkan event listener untuk tombol hapus pada baris baru
         itemRow.querySelector('.remove-item-btn').addEventListener('click', () => {
             itemRow.remove();
+            // Setelah menghapus item, perbarui pratinjau invoice jika sudah ada
+            if (invoiceContent.innerHTML.trim() !== '') {
+                generateInvoiceBtn.click(); // Trigger ulang pembuatan invoice
+            }
         });
     }
 
@@ -32,7 +36,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return new Intl.NumberFormat('id-ID', {
             style: 'currency',
             currency: 'IDR',
-            minimumFractionDigits: 0
+            minimumFractionDigits: 0 // Tidak ada desimal untuk Rupiah
         }).format(number);
     }
 
@@ -66,11 +70,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
             itemsHtml += `
                 <tr>
-                    <td>${index + 1}</td>
-                    <td>${description}</td>
-                    <td style="text-align: right;">${quantity}</td>
-                    <td style="text-align: right;">${formatRupiah(price)}</td>
-                    <td style="text-align: right;">${formatRupiah(amount)}</td>
+                    <td style="border: 1px solid #eee; padding: 8px; text-align: left;">${index + 1}</td>
+                    <td style="border: 1px solid #eee; padding: 8px; text-align: left;">${description}</td>
+                    <td style="border: 1px solid #eee; padding: 8px; text-align: right;">${quantity}</td>
+                    <td style="border: 1px solid #eee; padding: 8px; text-align: right;">${formatRupiah(price)}</td>
+                    <td style="border: 1px solid #eee; padding: 8px; text-align: right;">${formatRupiah(amount)}</td>
                 </tr>
             `;
         });
@@ -81,7 +85,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Konten HTML untuk invoice yang akan dicetak/diunduh
         // Penting: Pastikan gaya inline yang cukup agar konsisten di PDF
         const invoiceHtmlContent = `
-            <div style="padding: 15px;">
+            <div style="padding: 15px; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: #333;">
                 <div style="text-align: center; margin-bottom: 20px;">
                     <h2 style="color: #2c3e50; margin-bottom: 5px;">FAKTUR / INVOICE</h2>
                     <p style="margin: 2px 0;"><strong>Nomor Invoice:</strong> ${invoiceNumber}</p>
@@ -150,26 +154,49 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Event listener untuk tombol unduh PDF
     downloadPdfBtn.addEventListener('click', () => {
-        // Ambil elemen yang berisi seluruh pratinjau invoice, yaitu div dengan id 'invoicePreview'
-        const element = document.getElementById('invoicePreview'); 
-        
+        const element = document.getElementById('invoicePreview');
+
         // Sembunyikan tombol cetak dan unduh saat akan dikonversi ke PDF
         printInvoiceBtn.style.display = 'none';
         downloadPdfBtn.style.display = 'none';
 
-        // Opsi konfigurasi untuk html2pdf
+        // Pastikan konten invoice sudah dibuat sebelum mengunduh
+        if (invoiceContent.innerHTML.trim() === '') {
+            alert('Harap buat invoice terlebih dahulu dengan menekan tombol "Buat Invoice".');
+            printInvoiceBtn.style.display = 'block';
+            downloadPdfBtn.style.display = 'block';
+            return; // Hentikan fungsi jika konten kosong
+        }
+
         const options = {
             margin: 10,
             filename: `invoice-${document.getElementById('invoiceNumber').value}.pdf`,
             image: { type: 'jpeg', quality: 0.98 },
-            html2canvas: { scale: 2, logging: true, dpi: 192, letterRendering: true, useCORS: true }, // Tambahkan useCORS
-            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            html2canvas: {
+                scale: 2, // Meningkatkan resolusi render
+                logging: true, // Untuk debugging di console browser
+                dpi: 192,
+                letterRendering: true,
+                useCORS: true, // Penting untuk gambar dari luar domain
+                allowTaint: false, // Penting jika ada konten yang "kotor" dari CORS
+                scrollY: -window.scrollY // Memastikan rendering dimulai dari atas halaman
+            },
+            jsPDF: {
+                unit: 'mm',
+                format: 'a4',
+                orientation: 'portrait'
+            }
         };
 
-        // Menggunakan setTimeout untuk memastikan tombol sudah tersembunyi sebelum konversi
+        // Menggunakan setTimeout untuk memastikan DOM diperbarui sebelum konversi
         setTimeout(() => {
             html2pdf().from(element).set(options).save().then(() => {
                 // Tampilkan kembali tombol setelah PDF selesai diunduh
+                printInvoiceBtn.style.display = 'block';
+                downloadPdfBtn.style.display = 'block';
+            }).catch(error => {
+                console.error("Error generating PDF:", error);
+                alert("Terjadi kesalahan saat membuat PDF. Silakan coba lagi.");
                 printInvoiceBtn.style.display = 'block';
                 downloadPdfBtn.style.display = 'block';
             });
