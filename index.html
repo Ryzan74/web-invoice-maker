@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Invoice Generator</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; max-width: 800px; margin: auto; background: #f9f9f9; }
+    h1 { text-align: center; }
+    input, button { padding: 10px; margin: 5px 0; width: 100%; }
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+    button { background: #007BFF; color: white; border: none; cursor: pointer; }
+    button:hover { background: #0056b3; }
+  </style>
+</head>
+<body>
+  <h1>Invoice Generator</h1>
+
+  <label>Nama Klien</label>
+  <input type="text" id="clientName" placeholder="Contoh: PT. Sukses Selalu" />
+
+  <label>Tanggal</label>
+  <input type="date" id="invoiceDate" />
+
+  <h3>Item</h3>
+  <input type="text" id="itemDesc" placeholder="Deskripsi item" />
+  <input type="number" id="itemQty" placeholder="Jumlah" />
+  <input type="number" id="itemPrice" placeholder="Harga per item" />
+  <button onclick="addItem()">+ Tambah Item</button>
+
+  <table id="invoiceTable">
+    <thead>
+      <tr><th>Deskripsi</th><th>Qty</th><th>Harga</th><th>Total</th></tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <h3>Total: <span id="invoiceTotal">0</span></h3>
+
+  <button onclick="downloadPDF()">Download Invoice (PDF)</button>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script>
+    let total = 0;
+    function addItem() {
+      const desc = document.getElementById('itemDesc').value;
+      const qty = parseInt(document.getElementById('itemQty').value);
+      const price = parseInt(document.getElementById('itemPrice').value);
+      if (!desc || !qty || !price) return alert("Isi semua kolom item.");
+      const itemTotal = qty * price;
+      total += itemTotal;
+      const row = `<tr><td>${desc}</td><td>${qty}</td><td>${price}</td><td>${itemTotal}</td></tr>`;
+      document.querySelector("#invoiceTable tbody").innerHTML += row;
+      document.getElementById("invoiceTotal").innerText = total;
+      document.getElementById("itemDesc").value = "";
+      document.getElementById("itemQty").value = "";
+      document.getElementById("itemPrice").value = "";
+    }
+
+    async function downloadPDF() {
+      const {{ jsPDF }} = window.jspdf;
+      const doc = new jsPDF();
+      const name = document.getElementById('clientName').value;
+      const date = document.getElementById('invoiceDate').value;
+      let y = 20;
+      doc.setFontSize(16);
+      doc.text("INVOICE", 105, y, { align: "center" });
+      y += 10;
+      doc.setFontSize(12);
+      doc.text(`Klien: ${name}`, 20, y);
+      doc.text(`Tanggal: ${date}`, 150, y);
+      y += 10;
+      doc.text("Item", 20, y);
+      doc.text("Qty", 90, y);
+      doc.text("Harga", 120, y);
+      doc.text("Total", 160, y);
+      y += 6;
+      const rows = document.querySelectorAll("#invoiceTable tbody tr");
+      rows.forEach(row => {
+        const cells = row.querySelectorAll("td");
+        doc.text(cells[0].innerText, 20, y);
+        doc.text(cells[1].innerText, 90, y);
+        doc.text(cells[2].innerText, 120, y);
+        doc.text(cells[3].innerText, 160, y);
+        y += 6;
+      });
+      y += 6;
+      doc.text(`Total: ${total}`, 160, y);
+      doc.save("invoice.pdf");
+    }
+  </script>
+</body>
+</html>
