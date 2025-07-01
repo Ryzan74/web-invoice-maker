@@ -1,66 +1,89 @@
-
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>Invoice Generator Pro</title>
-    <link rel="stylesheet" href="style.css" />
-</head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoice Generator UMKM</title>
     <link rel="stylesheet" href="style.css">
-<script src="script.js"></script>
+</head>
 <body>
-    <header>
-        <h1>Invoice Generator Pro</h1>
-        <p>Versi lengkap dengan fitur tambahan</p>
-    </header>
-
     <div class="container">
-        <label>Nama Pengirim:</label>
-        <input type="text" id="sender" placeholder="Contoh: PT Digital Makmur"/>
+        <h1>Invoice Generator</h1>
 
-        <label>Nama Klien:</label>
-        <input type="text" id="client" placeholder="Contoh: Bapak Arif"/>
+        <div class="invoice-form">
+            <h2>Data Invoice</h2>
+            <div class="form-group">
+                <label for="invoiceNumber">Nomor Invoice:</label>
+                <input type="text" id="invoiceNumber" value="INV-202407001">
+            </div>
+            <div class="form-group">
+                <label for="invoiceDate">Tanggal Invoice:</label>
+                <input type="date" id="invoiceDate" value="2024-07-01">
+            </div>
+            <div class="form-group">
+                <label for="dueDate">Jatuh Tempo:</label>
+                <input type="date" id="dueDate" value="2024-07-15">
+            </div>
 
-        <label>Upload Logo:</label>
-        <input type="file" id="logo" accept="image/*"/>
+            <h2>Informasi Penjual</h2>
+            <div class="form-group">
+                <label for="sellerName">Nama Bisnis Anda:</label>
+                <input type="text" id="sellerName" value="Nama Usaha Anda">
+            </div>
+            <div class="form-group">
+                <label for="sellerAddress">Alamat Penjual:</label>
+                <textarea id="sellerAddress">Jl. Contoh No. 123, Bojongsoang, Bandung</textarea>
+            </div>
+            <div class="form-group">
+                <label for="sellerPhone">Telepon Penjual:</label>
+                <input type="text" id="sellerPhone" value="0812-3456-7890">
+            </div>
+            <div class="form-group">
+                <label for="sellerEmail">Email Penjual:</label>
+                <input type="email" id="sellerEmail" value="info@usahaanda.com">
+            </div>
 
-        <label>Tanggal Jatuh Tempo:</label>
-        <input type="date" id="due-date"/>
+            <h2>Informasi Pembeli</h2>
+            <div class="form-group">
+                <label for="buyerName">Nama Pelanggan:</label>
+                <input type="text" id="buyerName" value="Nama Pelanggan Anda">
+            </div>
+            <div class="form-group">
+                <label for="buyerAddress">Alamat Pembeli:</label>
+                <textarea id="buyerAddress">Jl. Pelanggan No. 45, Jakarta</textarea>
+            </div>
 
-        <label>Catatan Tambahan:</label>
-        <input type="text" id="note" placeholder="Terima kasih atas kepercayaannya."/>
+            <h2>Rincian Barang/Jasa</h2>
+            <div id="itemsContainer">
+                <div class="item-row">
+                    <input type="text" class="item-description" placeholder="Deskripsi Barang/Jasa" value="Jasa Desain Website">
+                    <input type="number" class="item-quantity" placeholder="Qty" value="1" min="1">
+                    <input type="number" class="item-price" placeholder="Harga Satuan" value="2500000" min="0">
+                    <button class="remove-item-btn">X</button>
+                </div>
+            </div>
+            <button id="addItemBtn">Tambah Item</button>
 
-        <table id="invoice-table">
-            <thead>
-                <tr>
-                    <th>Item</th>
-                    <th>Qty</th>
-                    <th>Harga</th>
-                    <th>Total</th>
-                </tr>
-            </thead>
-            <tbody id="item-body">
-                <tr>
-                    <td><input type="text" class="item-name" placeholder="Desain Logo"/></td>
-                    <td><input type="number" class="item-qty" value="1"/></td>
-                    <td><input type="number" class="item-price" value="0"/></td>
-                    <td class="item-total">0</td>
-                </tr>
-            </tbody>
-            <tfoot>
-                <tr>
-                    <td colspan="3" style="text-align:right;">Total Harga:</td>
-                    <td id="grand-total">0</td>
-                </tr>
-            </tfoot>
-        </table>
+            <div class="form-group">
+                <label for="discount">Diskon (Rp):</label>
+                <input type="number" id="discount" value="0" min="0">
+            </div>
+            <div class="form-group">
+                <label for="taxRate">Pajak (%):</label>
+                <input type="number" id="taxRate" value="0" min="0" max="100">
+            </div>
 
-        <button onclick="addRow()">+ Tambah Item</button>
-        <button onclick="downloadInvoice()">Download PDF</button>
+            <button id="generateInvoiceBtn">Buat Invoice</button>
+        </div>
+
+        <div class="invoice-preview" id="invoicePreview">
+            <h2>Pratinjau Invoice</h2>
+            <div id="invoiceContent">
+                </div>
+            <button id="printInvoiceBtn">Cetak Invoice</button>
+        </div>
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="script.js"></script>
 </body>
 </html>
