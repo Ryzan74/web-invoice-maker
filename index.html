@@ -3,15 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Invoice Generator UMKM</title>
+    <title>Invoice Generator UMKM Premium</title>
     <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
 </head>
 <body>
     <div class="container">
-        <h1>Invoice Generator</h1>
+        <h1>Invoice Generator Premium</h1>
 
         <div class="invoice-form">
-            <h2>Data Invoice</h2>
+            <h2>Pengaturan Invoice</h2>
             <div class="form-group">
                 <label for="invoiceNumber">Nomor Invoice:</label>
                 <input type="text" id="invoiceNumber" value="INV-202407001">
@@ -25,7 +26,14 @@
                 <input type="date" id="dueDate" value="2024-07-15">
             </div>
 
+            <hr>
+
             <h2>Informasi Penjual</h2>
+            <div class="form-group">
+                <label for="sellerLogo">Unggah Logo (Opsional):</label>
+                <input type="file" id="sellerLogo" accept="image/*">
+                <img id="logoPreview" src="" alt="Pratinjau Logo" style="max-width: 100px; max-height: 100px; display: none; margin-top: 10px; border: 1px solid #ddd;">
+            </div>
             <div class="form-group">
                 <label for="sellerName">Nama Bisnis Anda:</label>
                 <input type="text" id="sellerName" value="Nama Usaha Anda">
@@ -43,6 +51,8 @@
                 <input type="email" id="sellerEmail" value="info@usahaanda.com">
             </div>
 
+            <hr>
+
             <h2>Informasi Pembeli</h2>
             <div class="form-group">
                 <label for="buyerName">Nama Pelanggan:</label>
@@ -52,6 +62,8 @@
                 <label for="buyerAddress">Alamat Pembeli:</label>
                 <textarea id="buyerAddress">Jl. Pelanggan No. 45, Jakarta</textarea>
             </div>
+
+            <hr>
 
             <h2>Rincian Barang/Jasa</h2>
             <div id="itemsContainer">
@@ -73,17 +85,31 @@
                 <input type="number" id="taxRate" value="0" min="0" max="100">
             </div>
 
+            <hr>
+
+            <h2>Pengaturan Tampilan Premium</h2>
+            <div class="form-group">
+                <label for="invoiceTheme">Pilih Tema Invoice:</label>
+                <select id="invoiceTheme">
+                    <option value="default">Tema Default (Klasik)</option>
+                    <option value="modern">Tema Modern (Minimalis)</option>
+                    <option value="elegant">Tema Elegan (Formal)</option>
+                </select>
+            </div>
+
             <button id="generateInvoiceBtn">Buat Invoice</button>
         </div>
 
         <div class="invoice-preview" id="invoicePreview">
             <h2>Pratinjau Invoice</h2>
-            <div id="invoiceContent">
+            <div id="invoiceContent" class="invoice-theme-default">
                 </div>
             <button id="printInvoiceBtn">Cetak Invoice</button>
+            <button id="downloadPdfBtn">Unduh PDF</button>
         </div>
     </div>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <script src="script.js"></script>
 </body>
 </html>
