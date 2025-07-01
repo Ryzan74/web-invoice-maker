@@ -173,13 +173,14 @@ document.addEventListener('DOMContentLoaded', () => {
             filename: `invoice-${document.getElementById('invoiceNumber').value}.pdf`,
             image: { type: 'jpeg', quality: 0.98 },
             html2canvas: {
-                scale: 2, // Meningkatkan resolusi render
-                logging: true, // Untuk debugging di console browser
-                dpi: 192,
+                scale: 3, // Coba tingkatkan scale lebih tinggi lagi
+                logging: true,
+                dpi: 300, // Coba tingkatkan DPI
                 letterRendering: true,
-                useCORS: true, // Penting untuk gambar dari luar domain
-                allowTaint: false, // Penting jika ada konten yang "kotor" dari CORS
-                scrollY: -window.scrollY // Memastikan rendering dimulai dari atas halaman
+                useCORS: true,
+                allowTaint: true, // Coba izinkan taint (jika ada masalah CORS yang persisten)
+                scrollY: -window.scrollY, // Pastikan dimulai dari atas halaman
+                backgroundColor: '#ffffff' // Pastikan background putih, bukan transparan
             },
             jsPDF: {
                 unit: 'mm',
@@ -188,7 +189,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         };
 
-        // Menggunakan setTimeout untuk memastikan DOM diperbarui sebelum konversi
+        // Menggunakan setTimeout dengan penundaan sedikit lebih lama
         setTimeout(() => {
             html2pdf().from(element).set(options).save().then(() => {
                 // Tampilkan kembali tombol setelah PDF selesai diunduh
@@ -196,11 +197,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 downloadPdfBtn.style.display = 'block';
             }).catch(error => {
                 console.error("Error generating PDF:", error);
-                alert("Terjadi kesalahan saat membuat PDF. Silakan coba lagi.");
+                alert("Terjadi kesalahan saat membuat PDF. Silakan coba lagi. Cek konsol browser (F12) untuk detail error.");
                 printInvoiceBtn.style.display = 'block';
                 downloadPdfBtn.style.display = 'block';
             });
-        }, 100); // Penundaan singkat untuk memastikan DOM diperbarui
+        }, 300); // Penundaan 300ms untuk memastikan semua elemen termuat
+
     });
 
 
