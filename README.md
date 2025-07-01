@@ -1,6 +1,3 @@
-Tentu, ini `README.md` baru untuk versi Premium dari Invoice Generator Anda, yang menyoroti fitur-fitur baru dan cara penggunaannya:
-
----
 
 # Invoice Generator Premium untuk UMKM
 
